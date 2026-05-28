@@ -77,7 +77,6 @@ This platform can help security teams and students:
 * Docker Compose
 * Prometheus
 * Grafana
-* Chart.js
 
 ---
 
@@ -114,21 +113,3 @@ WebAutoSec Dashboard (Flask)
 * Scan history tracking
 * Security telemetry export for Prometheus
 * Dashboard visualization for security observability
-
----
-
-# Future Improvements
-
-* Active vulnerability scanning
-* Real-time scan progress monitoring
-* WebSocket-based live telemetry updates
-* Multi-target scanning
-* Authentication-aware scanning
-* Database-backed scan history
-* Kafka-based security event streaming
-* Grafana dashboard embedding
-* AI-assisted security triage
-* Attack surface visualization
-* SIEM integration support
-
----

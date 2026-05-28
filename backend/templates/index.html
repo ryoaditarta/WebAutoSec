@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>WebAutoSec</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        Chart.defaults.color = "#cbd5e1";
+        Chart.defaults.borderColor = "rgba(255,255,255,0.08)";
+    </script>
+
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="logo">WebAutoSec</div>
+        <div class="status">● ZAP Daemon Online</div>
+    </div>
+
+    <div class="container">
+
+        <div class="hero">
+
+            <h1>
+                Automated Web Attack Visibility Platform
+            </h1>
+
+            <p>
+                Containerized security orchestration platform
+                for vulnerability scanning, telemetry collection,
+                and observability visualization using OWASP ZAP.
+            </p>
+
+        </div>
+
+        <div class="card-container">
+
+            <div class="card">
+                <h2>Scanner Engine</h2>
+                <p>OWASP ZAP daemonized scanning infrastructure.</p>
+            </div>
+
+            <div class="card">
+                <h2>Security Automation</h2>
+                <p>Python orchestration & automated telemetry processing.</p>
+            </div>
+
+            <div class="card">
+                <h2>Observability</h2>
+                <p>Centralized security telemetry visualization platform.</p>
+            </div>
+
+        </div>
+
+        <div class="scan-section">
+
+            <h2>Security Scan Control</h2>
+		
+	    <button id="scan-btn">
+    		Start Vulnerability Scan
+	    </button>
+
+            <div id="loading" style="display:nano;">
+                Running scan...
+            </div>
+
+        </div>
+
+        <div class="metrics-grid">
+
+            <div class="metric-card high">
+                <h3>HIGH</h3>
+                <p id="high-count">0</p>
+            </div>
+
+            <div class="metric-card medium">
+                <h3>MEDIUM</h3>
+                <p id="medium-count">0</p>
+            </div>
+
+            <div class="metric-card low">
+                <h3>LOW</h3>
+                <p id="low-count">0</p>
+            </div>
+
+            <div class="metric-card info">
+                <h3>INFO</h3>
+                <p id="info-count">0</p>
+            </div>
+
+        </div>
+
+        <div class="chart-grid">
+
+            <div class="chart-card">
+                <h3>Vulnerability Distribution</h3>
+                <canvas id="severityChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h3>Top Vulnerabilities</h3>
+                <canvas id="alertChart"></canvas>
+            </div>
+
+        </div>
+
+        <div class="table-section">
+
+            <h2>Recent Findings</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Alert</th>
+                        <th>Risk</th>
+                        <th>Confidence</th>
+                        <th>CWE</th>
+                    </tr>
+                </thead>
+
+                <tbody id="findings-body">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="table-section">
+
+            <h2>Scan History</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Total Alerts</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+
+                <tbody id="history-body">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+let severityChart;
+let alertChart;
+let scanRunning = false;
+
+async function startScan() {
+
+    console.log("SCAN BUTTON CLICKED");
+
+    if (scanRunning) {
+        return;
+    }
+
+    scanRunning = true;
+
+    const button =
+        document.getElementById("scan-btn");
+
+    const loading =
+        document.getElementById("loading");
+
+    button.disabled = true;
+
+    button.innerText = "Scanning...";
+
+    loading.style.display = "block";
+
+    try {
+
+        const response =
+            await fetch('/scan');
+
+        console.log(response);
+
+        const data =
+            await response.json();
+
+        console.log(data);
+
+        updateMetrics(data.summary.severity);
+
+        updateFindings(data.findings);
+
+        updateHistory(data.history);
+
+        renderSeverityChart(data.summary.severity);
+
+        renderAlertChart(data.charts.top_alerts);
+
+    } catch(err) {
+
+        console.error(err);
+
+        alert("Scan failed");
+    }
+
+    loading.style.display = "none";
+
+    button.disabled = false;
+
+    button.innerText =
+        "Start Vulnerability Scan";
+
+    scanRunning = false;
+}
+
+
+function updateMetrics(severity) {
+
+    document.getElementById("high-count").innerText =
+        severity.High || 0;
+
+    document.getElementById("medium-count").innerText =
+        severity.Medium || 0;
+
+    document.getElementById("low-count").innerText =
+        severity.Low || 0;
+
+    document.getElementById("info-count").innerText =
+        severity.Informational || 0;
+}
+
+
+function updateFindings(findings) {
+
+    const body =
+        document.getElementById("findings-body");
+
+    body.innerHTML = "";
+
+    findings.forEach(finding => {
+
+        body.innerHTML += `
+            <tr>
+                <td>${finding.alert}</td>
+                <td>${finding.risk}</td>
+                <td>${finding.confidence}</td>
+                <td>${finding.cweid}</td>
+            </tr>
+        `;
+    });
+}
+
+
+function updateHistory(history) {
+
+    const body =
+        document.getElementById("history-body");
+
+    body.innerHTML = "";
+
+    history.forEach(scan => {
+
+        body.innerHTML += `
+            <tr>
+                <td>${scan.timestamp}</td>
+                <td>${scan.total_alerts}</td>
+                <td>${scan.duration}s</td>
+            </tr>
+        `;
+    });
+}
+
+
+function renderSeverityChart(data) {
+
+    const ctx =
+        document.getElementById("severityChart");
+
+    if (severityChart) {
+        severityChart.destroy();
+    }
+
+    severityChart = new Chart(ctx, {
+
+        type: 'pie',
+
+        data: {
+
+            labels: Object.keys(data),
+
+            datasets: [{
+                data: Object.values(data)
+            }]
+        }
+    });
+}
+
+
+function renderAlertChart(data) {
+
+    const ctx =
+        document.getElementById("alertChart");
+
+    if (alertChart) {
+        alertChart.destroy();
+    }
+
+    alertChart = new Chart(ctx, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: Object.keys(data),
+
+            datasets: [{
+                label: 'Findings',
+                data: Object.values(data)
+            }]
+        }
+    });
+}
+
+
+document
+    .getElementById("scan-btn")
+    .addEventListener("click", startScan);
+
+</script>
+
+</body>
+</html>

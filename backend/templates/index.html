@@ -1,130 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>WebAutoSec</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        Chart.defaults.color = "#cbd5e1";
-        Chart.defaults.borderColor = "rgba(255,255,255,0.08)";
-    </script>
 
 </head>
 
 <body>
 
-    <div class="navbar">
-        <div class="logo">WebAutoSec</div>
-        <div class="status">● ZAP Daemon Online</div>
-    </div>
+    <nav class="navbar">
+
+        <div class="logo">
+            WebAutoSec
+        </div>
+
+        <div class="status">
+            ● Security Platform Online
+        </div>
+
+    </nav>
 
     <div class="container">
 
-        <div class="hero">
+        <!-- HERO -->
+
+        <section class="hero">
 
             <h1>
-                Automated Web Attack Visibility Platform
+
+                Security Assessment &
+                Observability Platform
+
             </h1>
 
             <p>
-                Containerized security orchestration platform
-                for vulnerability scanning, telemetry collection,
-                and observability visualization using OWASP ZAP.
+
+                Centralized vulnerability assessment,
+                automated security triage,
+                and attack visibility powered by
+                OWASP ZAP.
+
             </p>
 
-        </div>
+        </section>
 
-        <div class="card-container">
+        <!-- ASSETS -->
+
+        <section class="scan-section">
+
+            <h2>
+                Security Assets
+            </h2>
+
+            <p>
+
+                Select a target asset and launch
+                a vulnerability assessment.
+
+            </p>
+
+            <div class="card-container">
+
+                <div class="card">
+
+                    <h2>
+                        OWASP Juice Shop
+                    </h2>
+
+                    <p>
+
+                        Modern vulnerable
+                        Node.js application
+
+                    </p>
+
+                    <br>
+
+                    <button
+                        onclick="startScan('juice-shop')">
+
+                        Start Assessment
+
+                    </button>
+
+                </div>
+
+                <div class="card">
+
+                    <h2>
+                        DVWA
+                    </h2>
+
+                    <p>
+
+                        Damn Vulnerable
+                        Web Application
+
+                    </p>
+
+                    <br>
+
+                    <button
+                        onclick="startScan('dvwa')">
+
+                        Start Assessment
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <br>
 
             <div class="card">
-                <h2>Scanner Engine</h2>
-                <p>OWASP ZAP daemonized scanning infrastructure.</p>
+
+                <h2>
+                    Current Assessment
+                </h2>
+
+                <p>
+
+                    Selected Asset:
+                    <strong id="current-target">
+                        None
+                    </strong>
+
+                </p>
+
+                <br>
+
+                <div id="loading">
+
+                    Running vulnerability
+                    assessment...
+
+                </div>
+
             </div>
 
-            <div class="card">
-                <h2>Security Automation</h2>
-                <p>Python orchestration & automated telemetry processing.</p>
-            </div>
+        </section>
 
-            <div class="card">
-                <h2>Observability</h2>
-                <p>Centralized security telemetry visualization platform.</p>
-            </div>
-
-        </div>
-
-        <div class="scan-section">
-
-            <h2>Security Scan Control</h2>
-		
-	    <button id="scan-btn">
-    		Start Vulnerability Scan
-	    </button>
-
-            <div id="loading" style="display:nano;">
-                Running scan...
-            </div>
-
-        </div>
+        <!-- METRICS -->
 
         <div class="metrics-grid">
 
             <div class="metric-card high">
-                <h3>HIGH</h3>
-                <p id="high-count">0</p>
+
+                <h3>High</h3>
+
+                <p id="high-count">
+                    0
+                </p>
+
             </div>
 
             <div class="metric-card medium">
-                <h3>MEDIUM</h3>
-                <p id="medium-count">0</p>
+
+                <h3>Medium</h3>
+
+                <p id="medium-count">
+                    0
+                </p>
+
             </div>
 
             <div class="metric-card low">
-                <h3>LOW</h3>
-                <p id="low-count">0</p>
+
+                <h3>Low</h3>
+
+                <p id="low-count">
+                    0
+                </p>
+
             </div>
 
             <div class="metric-card info">
-                <h3>INFO</h3>
-                <p id="info-count">0</p>
+
+                <h3>Informational</h3>
+
+                <p id="info-count">
+                    0
+                </p>
+
             </div>
 
         </div>
+
+        <!-- CHARTS -->
 
         <div class="chart-grid">
 
             <div class="chart-card">
-                <h3>Vulnerability Distribution</h3>
+
+                <h3>
+                    Severity Distribution
+                </h3>
+
                 <canvas id="severityChart"></canvas>
+
             </div>
 
             <div class="chart-card">
-                <h3>Top Vulnerabilities</h3>
+
+                <h3>
+                    Top Vulnerabilities
+                </h3>
+
                 <canvas id="alertChart"></canvas>
+
             </div>
 
         </div>
 
+        <!-- TRIAGE -->
+
         <div class="table-section">
 
-            <h2>Recent Findings</h2>
+            <h2>
+                Priority Findings
+            </h2>
 
             <table>
 
                 <thead>
+
                     <tr>
-                        <th>Alert</th>
+
+                        <th>Priority</th>
+
+                        <th>Finding</th>
+
                         <th>Risk</th>
-                        <th>Confidence</th>
-                        <th>CWE</th>
+
+                        <th>Occurrences</th>
+
                     </tr>
+
+                </thead>
+
+                <tbody id="triage-body">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- FINDINGS -->
+
+        <div class="table-section">
+
+            <h2>
+                Recent Findings
+            </h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Alert</th>
+
+                        <th>Risk</th>
+
+                        <th>Confidence</th>
+
+                        <th>CWE</th>
+
+                    </tr>
+
                 </thead>
 
                 <tbody id="findings-body">
@@ -135,18 +294,30 @@
 
         </div>
 
+        <!-- HISTORY -->
+
         <div class="table-section">
 
-            <h2>Scan History</h2>
+            <h2>
+                Scan History
+            </h2>
 
             <table>
 
                 <thead>
+
                     <tr>
-                        <th>Timestamp</th>
-                        <th>Total Alerts</th>
+
+                        <th>Time</th>
+
+                        <th>Target</th>
+
+                        <th>Alerts</th>
+
                         <th>Duration</th>
+
                     </tr>
+
                 </thead>
 
                 <tbody id="history-body">
@@ -159,189 +330,36 @@
 
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MODAL -->
 
-<script>
+    <div
+        id="finding-modal"
+        class="modal">
 
-let severityChart;
-let alertChart;
-let scanRunning = false;
+        <div class="modal-content">
 
-async function startScan() {
+            <span id="close-modal">
 
-    console.log("SCAN BUTTON CLICKED");
+                &times;
 
-    if (scanRunning) {
-        return;
-    }
+            </span>
 
-    scanRunning = true;
+            <h2 id="modal-title">
 
-    const button =
-        document.getElementById("scan-btn");
+            </h2>
 
-    const loading =
-        document.getElementById("loading");
+            <br>
 
-    button.disabled = true;
+            <div id="modal-details">
 
-    button.innerText = "Scanning...";
+            </div>
 
-    loading.style.display = "block";
+        </div>
 
-    try {
+    </div>
 
-        const response =
-            await fetch('/scan');
-
-        console.log(response);
-
-        const data =
-            await response.json();
-
-        console.log(data);
-
-        updateMetrics(data.summary.severity);
-
-        updateFindings(data.findings);
-
-        updateHistory(data.history);
-
-        renderSeverityChart(data.summary.severity);
-
-        renderAlertChart(data.charts.top_alerts);
-
-    } catch(err) {
-
-        console.error(err);
-
-        alert("Scan failed");
-    }
-
-    loading.style.display = "none";
-
-    button.disabled = false;
-
-    button.innerText =
-        "Start Vulnerability Scan";
-
-    scanRunning = false;
-}
-
-
-function updateMetrics(severity) {
-
-    document.getElementById("high-count").innerText =
-        severity.High || 0;
-
-    document.getElementById("medium-count").innerText =
-        severity.Medium || 0;
-
-    document.getElementById("low-count").innerText =
-        severity.Low || 0;
-
-    document.getElementById("info-count").innerText =
-        severity.Informational || 0;
-}
-
-
-function updateFindings(findings) {
-
-    const body =
-        document.getElementById("findings-body");
-
-    body.innerHTML = "";
-
-    findings.forEach(finding => {
-
-        body.innerHTML += `
-            <tr>
-                <td>${finding.alert}</td>
-                <td>${finding.risk}</td>
-                <td>${finding.confidence}</td>
-                <td>${finding.cweid}</td>
-            </tr>
-        `;
-    });
-}
-
-
-function updateHistory(history) {
-
-    const body =
-        document.getElementById("history-body");
-
-    body.innerHTML = "";
-
-    history.forEach(scan => {
-
-        body.innerHTML += `
-            <tr>
-                <td>${scan.timestamp}</td>
-                <td>${scan.total_alerts}</td>
-                <td>${scan.duration}s</td>
-            </tr>
-        `;
-    });
-}
-
-
-function renderSeverityChart(data) {
-
-    const ctx =
-        document.getElementById("severityChart");
-
-    if (severityChart) {
-        severityChart.destroy();
-    }
-
-    severityChart = new Chart(ctx, {
-
-        type: 'pie',
-
-        data: {
-
-            labels: Object.keys(data),
-
-            datasets: [{
-                data: Object.values(data)
-            }]
-        }
-    });
-}
-
-
-function renderAlertChart(data) {
-
-    const ctx =
-        document.getElementById("alertChart");
-
-    if (alertChart) {
-        alertChart.destroy();
-    }
-
-    alertChart = new Chart(ctx, {
-
-        type: 'bar',
-
-        data: {
-
-            labels: Object.keys(data),
-
-            datasets: [{
-                label: 'Findings',
-                data: Object.values(data)
-            }]
-        }
-    });
-}
-
-
-document
-    .getElementById("scan-btn")
-    .addEventListener("click", startScan);
-
-</script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
+
 </html>
